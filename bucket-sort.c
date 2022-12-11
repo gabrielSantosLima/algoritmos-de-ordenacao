@@ -317,7 +317,7 @@ void test_random_numbers()
         add(array, number / get_decimal(number, 1));
     }
     bucket_sort(array);
-    // printArray(array) // Remover este comentário para ver a saída
+    // print_array(array) // Remover este comentário para ver a saída
 }
 
 int main() // Função principal
