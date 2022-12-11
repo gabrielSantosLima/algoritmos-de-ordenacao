@@ -22,7 +22,7 @@ typedef int bool;
 // ==================== Array ====================
 typedef struct ARRAY
 {
-    int lenght;   // Tamanho atual do vetor
+    int length;   // Tamanho atual do vetor
     int size;     // Tamanho máximo do vetor
     double *data; // Primeiro elemento do vetor
 } ARRAY;
@@ -31,7 +31,7 @@ typedef struct ARRAY
 ARRAY *new_array(int size)
 {
     ARRAY *narray = (ARRAY *)malloc(sizeof(ARRAY));
-    narray->lenght = 0;
+    narray->length = 0;
     narray->size = size;
     narray->data = (double *)malloc(sizeof(double) * size); // Aloca um vetor de double de tamanho sizeof(double) * size
     return narray;
@@ -41,14 +41,14 @@ ARRAY *new_array(int size)
 bool is_empty(ARRAY *array)
 {
     return array == NULL ||
-           (array != NULL && array->lenght == 0);
+           (array != NULL && array->length == 0);
 }
 
 // Verifica se vetor está cheio
 bool is_full(ARRAY *array)
 {
     return array == NULL ||
-           (array != NULL && array->lenght == array->size);
+           (array != NULL && array->length == array->size);
 }
 
 // Adiciona um elemento em um vetor
@@ -56,8 +56,8 @@ void add(ARRAY *array, double value)
 {
     if (is_full(array))
         return;
-    array->data[array->lenght] = value;
-    array->lenght++;
+    array->data[array->length] = value;
+    array->length++;
 }
 
 // Exibe os elementos de uma vetor
@@ -65,7 +65,7 @@ void print_array(ARRAY *array)
 {
     if (is_empty(array))
         return;
-    for (int index = 0; index < array->lenght; index++)
+    for (int index = 0; index < array->length; index++)
         printf("%f ", array->data[index]);
 }
 
@@ -75,7 +75,7 @@ ARRAY *concat(ARRAY *arrays[], int size)
     ARRAY *array = new_array(size);
     for (int index = 0; index < size; index++)
     {
-        for (int element_index = 0; element_index < arrays[index]->lenght; element_index++)
+        for (int element_index = 0; element_index < arrays[index]->length; element_index++)
             add(array, arrays[index]->data[element_index]);
     }
     return array;
@@ -168,9 +168,9 @@ ARRAY *list_2_array(LIST *list)
 // Aplica a ordenação por inserção
 void insertion_sort(ARRAY *array)
 {
-    if (is_empty(array) || (!is_empty(array) && array->lenght == 1))
+    if (is_empty(array) || (!is_empty(array) && array->length == 1))
         return;
-    for (int index = 1; index < array->lenght; index++)
+    for (int index = 1; index < array->length; index++)
     {
         double key = array->data[index];
         int i = index - 1;
@@ -205,7 +205,7 @@ void bucket_sort(ARRAY *array)
         buckets_as_array[index] = bucket_as_array;             // Insere vetor no vetor de vetores
     }
     ARRAY *sorted_array = concat(buckets_as_array, size); // Concatena os vetores
-    for (int index = 0; index < sorted_array->lenght; index++)
+    for (int index = 0; index < sorted_array->length; index++)
         array->data[index] = sorted_array->data[index]; // Reatribui os valores já ordenados para o vetor original
 }
 // =====================================================
