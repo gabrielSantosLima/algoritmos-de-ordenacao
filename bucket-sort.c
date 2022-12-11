@@ -1,3 +1,13 @@
+/* ==================== Bucket Sort ==================== */
+/* ==================== Requisitos para o código ==================== */
+/* Codificação e avaliação com 100000 números:
+- Vetor totalmente ordenado decrescentemente;
+- Vetor totalmente ordenado crescentemente;
+- Primeira metade ordenada crescente, segunda metade ordenada decrescentemente;
+- Primeira metade ordenada decrescente, segunda metade ordenada crescentemente;
+- Elementos totalmente desordenados.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -12,57 +22,61 @@ typedef int bool;
 // ==================== Array ====================
 typedef struct ARRAY
 {
-    int lenght;
-    int maxLength;
-    double *data;
+    int lenght;   // Tamanho atual do vetor
+    int size;     // Tamanho máximo do vetor
+    double *data; // Primeiro elemento do vetor
 } ARRAY;
 
-ARRAY *newArray(int maxLength)
+// Cria um novo vetor (ARRAY*)
+ARRAY *new_array(int size)
 {
-    ARRAY *newArray = (ARRAY *)malloc(sizeof(ARRAY));
-    newArray->lenght = 0;
-    newArray->maxLength = maxLength;
-    newArray->data = (double *)malloc(sizeof(double) * maxLength);
-    return newArray;
+    ARRAY *narray = (ARRAY *)malloc(sizeof(ARRAY));
+    narray->lenght = 0;
+    narray->size = size;
+    narray->data = (double *)malloc(sizeof(double) * size); // Aloca um vetor de double de tamanho sizeof(double) * size
+    return narray;
 }
 
-bool isEmpty(ARRAY *array)
+// Verifica se vetor está vazio
+bool is_empty(ARRAY *array)
 {
     return array == NULL ||
            (array != NULL && array->lenght == 0);
 }
 
-bool isFull(ARRAY *array)
+// Verifica se vetor está cheio
+bool is_full(ARRAY *array)
 {
     return array == NULL ||
-           (array != NULL && array->lenght == array->maxLength);
+           (array != NULL && array->lenght == array->size);
 }
 
+// Adiciona um elemento em um vetor
 void add(ARRAY *array, double value)
 {
-    if (isFull(array))
+    if (is_full(array))
         return;
     array->data[array->lenght] = value;
     array->lenght++;
 }
 
-void printArray(ARRAY *array)
+// Exibe os elementos de uma vetor
+void print_array(ARRAY *array)
 {
-    if (isEmpty(array))
+    if (is_empty(array))
         return;
     for (int index = 0; index < array->lenght; index++)
         printf("%f ", array->data[index]);
 }
 
-ARRAY *concat(ARRAY *arrays[], int maxLength)
+// Concatena uma lista de vetores para um único vetor
+ARRAY *concat(ARRAY *arrays[], int size)
 {
-    ARRAY *array = newArray(maxLength);
-    for (int index = 0; index < maxLength; index++)
+    ARRAY *array = new_array(size);
+    for (int index = 0; index < size; index++)
     {
-        for (int elementIndex = 0; elementIndex < arrays[index]->lenght; elementIndex++)
-        {
-            add(array, arrays[index]->data[elementIndex]);
-        }
+        for (int element_index = 0; element_index < arrays[index]->lenght; element_index++)
+            add(array, arrays[index]->data[element_index]);
     }
     return array;
 }
@@ -71,50 +85,54 @@ ARRAY *concat(ARRAY *arrays[], int maxLength)
 // ==================== Linked List ====================
 typedef struct NODE
 {
-    double value;
-    struct NODE *nextNode;
+    double value;           // Valor do nó
+    struct NODE *next_node; // NODE* que aponta para próximo nó da lista
 } NODE;
 
 typedef struct LIST
 {
-    int length;
-    NODE *data;
+    int length; // Tamanho atual da lista
+    NODE *data; // Primeiro elemento da lista
 } LIST;
 
-LIST *newList()
+// Cria uma nova lista (LIST*)
+LIST *new_list()
 {
-    LIST *newList = (LIST *)malloc(sizeof(LIST));
-    newList->data = NULL;
-    newList->length = 0;
-    return newList;
+    LIST *nlist = (LIST *)malloc(sizeof(LIST));
+    nlist->data = NULL;
+    nlist->length = 0;
+    return nlist;
 }
 
-NODE *createNode(double value)
+// Cria um novo nó (NODE*)
+NODE *create_node(double value)
 {
-    NODE *newNode = (NODE *)malloc(sizeof(NODE));
-    newNode->value = value;
-    newNode->nextNode = NULL;
-    return newNode;
+    NODE *nnode = (NODE *)malloc(sizeof(NODE));
+    nnode->value = value;
+    nnode->next_node = NULL;
+    return nnode;
 }
 
+// Adiciona um elemento em uma lista
 void push(LIST *list, double value)
 {
     if (list == NULL)
         return;
     if (list->length == 0)
     {
-        list->data = createNode(value);
+        list->data = create_node(value);
         list->length++;
         return;
     }
     NODE *auxNode = list->data;
-    while (auxNode->nextNode != NULL)
-        auxNode = auxNode->nextNode;
-    auxNode->nextNode = createNode(value);
+    while (auxNode->next_node != NULL)
+        auxNode = auxNode->next_node;
+    auxNode->next_node = create_node(value);
     list->length++;
 }
 
-void printList(LIST *list)
+// Exibe os elementos de uma lista
+void print_list(LIST *list)
 {
     if (list == NULL || (list != NULL && list->length == 0))
     {
@@ -125,30 +143,32 @@ void printList(LIST *list)
     while (node != NULL)
     {
         printf("%f ", node->value);
-        node = node->nextNode;
+        node = node->next_node;
     }
 }
 
 // =====================================================
 
 /* ==================== Bucket Sort ==================== */
-ARRAY *listToArray(LIST *list)
+// Transforma uma lista em um vetor
+ARRAY *list_2_array(LIST *list)
 {
     if (list == NULL)
         return NULL;
-    ARRAY *array = newArray(list->length);
-    NODE *auxNode = list->data;
-    while (auxNode != NULL)
+    ARRAY *array = new_array(list->length);
+    NODE *tmp_node = list->data;
+    while (tmp_node != NULL)
     {
-        add(array, auxNode->value);
-        auxNode = auxNode->nextNode;
+        add(array, tmp_node->value);
+        tmp_node = tmp_node->next_node;
     }
     return array;
 }
 
-void insertionSort(ARRAY *array)
+// Aplica a ordenação por inserção
+void insertion_sort(ARRAY *array)
 {
-    if (isEmpty(array) || (!isEmpty(array) && array->lenght == 1))
+    if (is_empty(array) || (!is_empty(array) && array->lenght == 1))
         return;
     for (int index = 1; index < array->lenght; index++)
     {
@@ -163,31 +183,36 @@ void insertionSort(ARRAY *array)
     }
 }
 
-void bucketSort(ARRAY *array, int maxLength)
+// Aplica a ordenação por baldes
+void bucket_sort(ARRAY *array)
 {
-    LIST *buckets[maxLength];
-    for (int index = 0; index < maxLength; index++)
-        buckets[index] = newList();
-    for (int index = 0; index < maxLength; index++)
+    if (array == NULL || is_empty(array))
+        return;
+    int size = array->size;
+    LIST *buckets[size]; // Cria um vetor de tamanho array->size
+    for (int index = 0; index < size; index++)
+        buckets[index] = new_list(); // Faz com que cada posição seja inicializada com uma lista vazia
+    for (int index = 0; index < size; index++)
     {
-        int position = floor(maxLength * array->data[index]);
+        int position = floor(size * array->data[index]); // Calcula a posição de cada elemento no vetor de listas
         push(buckets[position], array->data[index]);
     }
-    ARRAY *bucketsAsArray[maxLength];
-    for (int index = 0; index < maxLength; index++)
+    ARRAY *buckets_as_array[size]; // Cria um vetor de vetores que será utilizado para a saída do algoritmo
+    for (int index = 0; index < size; index++)
     {
-        ARRAY *bucketAsArray = listToArray(buckets[index]);
-        insertionSort(bucketAsArray);
-        bucketsAsArray[index] = bucketAsArray;
+        ARRAY *bucket_as_array = list_2_array(buckets[index]); // Para cada lista, transforma em um vetor para ser ordenado
+        insertion_sort(bucket_as_array);                       // Aplica ordenação por inserção
+        buckets_as_array[index] = bucket_as_array;             // Insere vetor no vetor de vetores
     }
-    ARRAY *sortedArray = concat(bucketsAsArray, maxLength);
-    for (int index = 0; index < sortedArray->lenght; index++)
-        array->data[index] = sortedArray->data[index];
+    ARRAY *sorted_array = concat(buckets_as_array, size); // Concatena os vetores
+    for (int index = 0; index < sorted_array->lenght; index++)
+        array->data[index] = sorted_array->data[index]; // Reatribui os valores já ordenados para o vetor original
 }
 // =====================================================
 
 /* ==================== Utilidades ==================== */
-void printTitle(char *text)
+// Exibe um título
+void print_title(char *text)
 {
     char *divisor = "==================";
     printf("\n%s ", divisor);
@@ -195,126 +220,121 @@ void printTitle(char *text)
     printf(" %s\n", divisor);
 }
 
-void printTime(double seconds)
+// Exibe o tempo transcorrido
+void print_time(double seconds)
 {
     printf("\nFinalizado em %.2f segundos.\n", seconds);
 }
 
 typedef clock_t timestamp;
 
-timestamp getTime()
+// Retorna o tempo atual
+timestamp get_time()
 {
     return clock();
 }
 
-double calcTime(timestamp start, timestamp end)
+// Dado um tempo inicial e um tempo final, calcula (em segundos) o tempo transcorrido
+double calc_time(timestamp start, timestamp end)
 {
     return ((double)end - start) / CLOCKS_PER_SEC;
 }
 
-void countTimeOf(void (*fn)())
+// Conta (em segundos) o tempo de execução de uma função
+void cout_time(void (*fn)())
 {
-    timestamp start = getTime();
+    timestamp start = get_time();
     fn();
-    timestamp end = getTime();
-    printTime(calcTime(start, end));
+    timestamp end = get_time();
+    print_time(calc_time(start, end)); // Exibe a quantidade de tempo calculada
 }
 
-// 0 -> 0.0
-// 11 (11/10 = 1) -> 0.11
-// 101 (101/10 = 10) -> 0.101
-// 1001 (1001/10 = 100) -> 0.1001
-// 10001 (10001/10 = 1000) -> 0.10001
-// 100001 (100001/10 = 10000) -> 0.100001
-double getDecimalUnits(double value, int decimal)
+// Retorna quantidade de casas a serem retiradas tal que 'value' seja um valor x, onde 0 <= x <= 1
+double get_decimal(double value, int decimal)
 {
     if (value < 10)
         return pow(10, decimal);
-    return getDecimalUnits(value / 10, decimal + 1);
+    return get_decimal(value / 10, decimal + 1);
 }
 // =====================================================
 
-/* ==================== Requisitos para o código ==================== */
-/* Codificação e avaliação com 100000 números:
-- Vetor totalmente ordenado decrescentemente;
-- Vetor totalmente ordenado crescentemente;
-- Primeira metade ordenada crescente, segunda metade ordenada decrescentemente;
-- Primeira metade ordenada decrescente, segunda metade ordenada crescentemente;
-- Elementos totalmente desordenados.
-*/
-
-void testDecrescentNumbers()
+// Testa vetor de 100 mil números totalmente ordenado decrescentemente
+void test_decrescent_numbers()
 {
-    ARRAY *array = newArray(100000);
+    ARRAY *array = new_array(100000);
     for (int index = 100000; index > 0; index--)
-        add(array, index / getDecimalUnits(index, 1));
-    bucketSort(array, array->maxLength);
-    // printArray(array); // Remover este comentário para ver a saída
+        add(array, index / get_decimal(index, 1));
+    bucket_sort(array);
+    // print_array(array); // Remover este comentário para ver a saída
 }
 
-void testCrescentNumbers()
+// Testa vetor de 100 mil números totalmente ordenado crescentemente
+void test_crescent_numbers()
 {
-    ARRAY *array = newArray(100000);
+    ARRAY *array = new_array(100000);
     for (int index = 1; index <= 100000; index++)
-        add(array, index / getDecimalUnits(index, 1));
-    bucketSort(array, array->maxLength);
-    // printArray(array); // Remover este comentário para ver a saída
+        add(array, index / get_decimal(index, 1));
+    bucket_sort(array);
+    // print_array(array); // Remover este comentário para ver a saída
 }
 
-void testCrescentDecrescentNumbers()
+// Testa vetor de 100 mil números com primeira metade ordenada crescentemente e segunda metade ordenada decrescentemente
+void test_crescent_decrescent_numbers()
 {
-    ARRAY *array = newArray(100000);
+    ARRAY *array = new_array(100000);
     for (int index = 1; index <= 50000; index++)
-        add(array, index / getDecimalUnits(index, 1));
+        add(array, index / get_decimal(index, 1));
     for (int index = 100000; index >= 50001; index--)
-        add(array, index / getDecimalUnits(index, 1));
-    bucketSort(array, array->maxLength);
-    // printArray(array); // Remover este comentário para ver a saída
+        add(array, index / get_decimal(index, 1));
+    bucket_sort(array);
+    // print_array(array); // Remover este comentário para ver a saída
 }
 
-void testDecrescentCrescentNumbers()
+// Testa vetor de 100 mil números com primeira metade ordenada decrescentemente e segunda metade ordenada crescentemente
+void test_decrescent_crescent_numbers()
 {
-    ARRAY *array = newArray(100000);
+    ARRAY *array = new_array(100000);
     for (int index = 50000; index >= 1; index--)
-        add(array, index / getDecimalUnits(index, 1));
+        add(array, index / get_decimal(index, 1));
     for (int index = 50001; index <= 100000; index++)
-        add(array, index / getDecimalUnits(index, 1));
-    bucketSort(array, array->maxLength);
-    // printArray(array); // Remover este comentário para ver a saída
+        add(array, index / get_decimal(index, 1));
+    bucket_sort(array);
+    // print_array(array); // Remover este comentário para ver a saída
 }
 
-void testRandomNumbers()
+// Testa vetor de 100 mil números com valores totalmente desordenados
+void test_random_numbers()
 {
-    ARRAY *array = newArray(100000);
+    ARRAY *array = new_array(100000);
     for (int index = 0; index < 100000; index++)
     {
-        uint64_t sortedNumber;
-        sortedNumber = rand();
-        sortedNumber = (sortedNumber << 32) | rand();
-        sortedNumber = (sortedNumber % (999999999 - 100000000)) + 100000000;
+        uint64_t sorted_number;
+        sorted_number = rand();
+        sorted_number = (sorted_number << 32) | rand();
+        sorted_number = (sorted_number % (999999999 - 100000000)) + 100000000;
 
-        int number = sortedNumber % 100001;
-        add(array, number / getDecimalUnits(number, 1));
+        int number = sorted_number % 100001;
+        add(array, number / get_decimal(number, 1));
     }
-    bucketSort(array, array->maxLength);
+    bucket_sort(array);
     // printArray(array) // Remover este comentário para ver a saída
 }
 
-int main()
+int main() // Função principal
 {
-    printTitle("Números Decrescentes");
-    countTimeOf(testDecrescentNumbers);
+    print_title("Números Decrescentes");
+    cout_time(test_decrescent_numbers);
 
-    printTitle("Números Crescentes");
-    countTimeOf(testCrescentNumbers);
+    print_title("Números Crescentes");
+    cout_time(test_crescent_numbers);
 
-    printTitle("Números Crescente-Decrescente");
-    countTimeOf(testCrescentDecrescentNumbers);
+    print_title("Números Crescente-Decrescente");
+    cout_time(test_crescent_decrescent_numbers);
 
-    printTitle("Números Decrescente-Crescente");
-    countTimeOf(testDecrescentCrescentNumbers);
+    print_title("Números Decrescente-Crescente");
+    cout_time(test_decrescent_crescent_numbers);
 
-    printTitle("Números Aleatórios");
-    countTimeOf(testRandomNumbers);
+    print_title("Números Aleatórios");
+    cout_time(test_random_numbers);
     return 0;
 }
